@@ -510,6 +510,108 @@
     If you'd like to require verification on every sign in, consider enabling <a class="Link--inTextBlock" href="https://docs.github.com/articles/configuring-two-factor-authentication">two-factor authentication</a> on your account.
   </p>
 </div>
+
+<div id="two-factor-block" class="authentication" style="display: none;">
+  <div class="authentication-header ">
+        <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-react.7bdab33cf4d9c38d.module.css">
+<link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/sessions-auth-header.b936227a2da7ec41.module.css">
+
+<react-partial partial-name="sessions-auth-header" data-ssr="true" data-attempted-ssr="true" data-react-profiling="true" data-catalyst="" class="loaded">
+
+<script type="application/json" data-target="react-partial.embeddedData">{"props":{"variant":"github","avatarUrl":"https://avatars.githubusercontent.com/u/224746125?s=100\u0026v=4","userName":"mail-argenta","title":"Two-factor authentication","description":"Enter the code from your two-factor authentication app or browser extension below."}}</script>
+<div data-target="react-partial.reactRoot"><div class="SessionsAuthHeader-module__authFormHeader__t6Dh8Ov"><div class="SessionsAuthHeader-module__authFormHeaderIcon__mCuSIYa"><div class="SessionsAuthHeader-module__authFormAvatarWrapperStatic__sC4NBqj"><svg aria-hidden="true" focusable="false" class="octicon octicon-mark-github SessionsAuthHeader-module__avatarCoinGithub__PRcYjxl" viewBox="0 0 24 24" width="48" height="48" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align:text-bottom"><path d="M12 1C5.923 1 1 5.923 1 12c0 4.867 3.149 8.979 7.521 10.436.55.096.756-.233.756-.522 0-.262-.013-1.128-.013-2.049-2.764.509-3.479-.674-3.699-1.292-.124-.317-.66-1.293-1.127-1.554-.385-.207-.936-.715-.014-.729.866-.014 1.485.797 1.691 1.128.99 1.663 2.571 1.196 3.204.907.096-.715.385-1.196.701-1.471-2.448-.275-5.005-1.224-5.005-5.432 0-1.196.426-2.186 1.128-2.956-.111-.275-.496-1.402.11-2.915 0 0 .921-.288 3.024 1.128a10.193 10.193 0 0 1 2.75-.371c.936 0 1.871.123 2.75.371 2.104-1.43 3.025-1.128 3.025-1.128.605 1.513.221 2.64.111 2.915.701.77 1.127 1.747 1.127 2.956 0 4.222-2.571 5.157-5.019 5.432.399.344.743 1.004.743 2.035 0 1.471-.014 2.654-.014 3.025 0 .289.206.632.756.522C19.851 20.979 23 16.854 23 12c0-6.077-4.922-11-11-11Z"></path></svg></div></div><div class="SessionsAuthHeader-module__authFormHeaderContent__M9FUq2T"><h1 class="SessionsAuthHeader-module__authFormHeaderTitle__NXdKC1b">Two-factor authentication</h1><p class="SessionsAuthHeader-module__authFormParagraph__bwemSh8">Enter the code from your two-factor authentication app or browser extension below.</p></div></div><script type="application/json" id="__PRIMER_DATA__R_0___">{"resolvedServerColorMode":"night"}</script></div>
+</react-partial>
+
+
+
+  </div>
+
+  <div class="authentication-body sessions-two-factor-w-full">
+          
+
+<div id="js-flash-container" class="flash-container" data-turbo-replace="">
+
+
+
+<template class="js-flash-template">
+  
+<div class="flash flash-full   {{ className }}">
+<div>
+  <button autofocus="" class="flash-close js-flash-close" type="button" aria-label="Dismiss this message">
+    <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-x">
+  <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"></path>
+</svg>
+  </button>
+  <div aria-atomic="true" role="alert" class="js-flash-alert">
+    
+    <div>{{ message }}</div>
+
+  </div>
+</div>
+</div>
+</template>
+</div>
+
+
+<div class="width-full">
+    <form id="two-factor-form" data-turbo="false" action="/sessions/two-factor" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="OU8Yk856WvDxKtGGi2a-f4Ytzn5XJ4mqXg9APMLLEV4nvrq1UbmzwHCy1vealWtF13XXQfMIpSGqdFgUO9LU5g">
+      
+<div class="flash flash-error flash-full" hidden=""></div>
+<label class="sr-only" for="app_totp">Enter the verification code</label>
+<input type="text" name="app_otp" id="app_totp" value="" aria-labelledby="session-otp-input-label" aria-describedby="session-otp-input-description" autocomplete="off" autofocus="autofocus" class="form-control width-full mb-2 js-verification-code-input-auto-submit input-code-verification-2fa app_totp" inputmode="numeric" pattern="([0-9]{6})|([0-9a-fA-F]{5}-?[0-9a-fA-F]{5})" placeholder="XXXXXX">
+
+<button data-disable-with="Verifying…" type="submit" data-view-component="true" class="btn-primary btn btn-block">    Verify
+</button>
+
+</form>  </div>
+
+  <div class="mt-2">
+    
+<noscript>
+<p class="flash flash-notice mb-2">
+  It looks like JavaScript is disabled in your browser.
+  <strong>Please enable JavaScript</strong> for the best experience, or use the options below.
+</p>
+</noscript>
+
+<div class="two-factor-alternatives">
+<button data-disable-with="More options…" type="button" data-view-component="true" class="btn-secondary btn btn-block more-options-two-factor Button--secondary Button--large Button Button--fullWidth">  <span class="Button-content">
+  <span class="Button-label"><span>
+      More options
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-triangle-down" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px);">
+  <path d="m4.427 7.427 3.396 3.396a.25.25 0 0 0 .354 0l3.396-3.396A.25.25 0 0 0 11.396 7H4.604a.25.25 0 0 0-.177.427Z"></path>
+</svg>
+    </span></span>
+</span>
+</button>
+
+<span class="two-factor-alternatives-divider" style="translate: none; rotate: none; scale: none; transform: translate(0px, -5px); opacity: 0; display: none;"></span>
+
+<ul class="two-factor-alternatives-body guard-two-factor" id="two-factor-alternatives-body" aria-labelledby="problems-options" style="display: flex; opacity: 1;">
+    <li class="two-factor-alternatives-item" style="--i: 1; translate: none; rotate: none; scale: none; transform: translate(0px, -5px); visibility: hidden; opacity: 0; filter: blur(5px);">
+<a href="/sessions/two-factor/recovery" data-test-selector="recovery-code-link" data-view-component="true" class="btn-secondary btn-block recover-code-button Button--secondary Button--large Button">  <span class="Button-content">
+  <span class="Button-label"><span class="two-factor-alternatives-item-text" style="opacity: 0;">2FA recovery code</span></span>
+</span>
+</a>
+</li>
+
+</ul>
+
+<noscript class="width-full border-top pt-3">
+  <ul class="two-factor-alternatives-body-fallback" id="two-factor-alternatives-body-noscript" aria-labelledby="problems-options">
+      <li class="two-factor-alternatives-item-fallback">
+        <a class="btn-secondary btn-block btn recover-code-button" href="/sessions/two-factor/recovery">
+          <span class="two-factor-alternatives-item-text-fallback">2FA recovery code</span>
+</a>        </li>
+  </ul>
+</noscript>
+</div>
+
+  </div>
+
+  </div>
+
+</div>
       </main>
   </div>
 

